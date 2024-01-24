@@ -334,7 +334,7 @@ if __name__ == '__main__':
     parser.add_argument('-batch_size', default=56, type=int,
                         help='Batch size.')
     parser.add_argument('-print_freq', type=int, default=5, help='The frequency to show training information.')
-    parser.add_argument('-father_path', type=str, default='tempp',
+    parser.add_argument('-father_path', type=str, default='save_AEA/physionet',
                         help='The father path of models parameters, log files.')
     parser.add_argument('-seed', type=int, default='111', help='Random seed.')
     parser.add_argument('-resume_path', type=str,

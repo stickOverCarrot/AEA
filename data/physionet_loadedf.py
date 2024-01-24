@@ -8,7 +8,7 @@ from scipy.signal import butter, filtfilt, iirnotch, lfilter
 MOVEMENT_START = 1 * 160  # MI starts 1s after trial begin
 MOVEMENT_END = 5 * 160  # MI lasts 4 seconds
 NOISE_LEVEL = 0.01
-ROOT_PATH = '/home/wong/dataset_ubuntu/physionet_MI/MI/files'  # Path to the raw physionet dataset
+ROOT_PATH = '~/physionet_MI/MI/files'  # Path to the raw physionet dataset
 SAVE = '20-Subjects'  # Save 20 subjects' dataset
 
 PHYSIONET_ELECTRODES = {
