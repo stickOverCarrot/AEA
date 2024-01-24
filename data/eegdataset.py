@@ -5,9 +5,8 @@ import numpy as np
 import random
 
 
-
 class EEGDataset(Dataset):
-    def __init__(self, source_X_list, target_X, source_y_list, target_y, data_num=None, pds=None, t1=None, t2=None):
+    def __init__(self, source_X_list, target_X, source_y_list, target_y, data_num=None, pds=None):
         super(EEGDataset, self).__init__()
         self.data_num = data_num
         self.t1 = t1
