@@ -127,7 +127,6 @@ class EEGNetP(BaseModel):
                  f2=16,
                  kernel_length=64,
                  drop_prob=0.25,
-                 classifier=True,
                  Adj=None,
                  ):
         super(EEGNetP, self).__init__()
@@ -182,28 +181,25 @@ class EEGNetP(BaseModel):
             pool_class(kernel_size=(1, 8), stride=(1, 8))
         )
 
-        if self.classifier:
-            out = np_to_var(
-                np.ones((1, self.in_chans, self.input_time_length, self.input_channel),
-                        dtype=np.float32))
-            out = self.forward_init(out)
-            # out = self.separable_conv(self.spatial_conv(self.temporal_conv(out)))
-            n_out_virtual_chans = out.cpu().data.numpy().shape[2]
-            n_out_time = out.cpu().data.numpy().shape[3]
-            self.final_conv_length = n_out_time
-            self.cls = nn.Sequential(
-                nn.Dropout(p=self.drop_prob),
-                Conv2dWithConstraint(self.f2, self.n_classes,
-                                     (n_out_virtual_chans, self.final_conv_length), max_norm=0.5,
-                                     bias=True),
-                # nn.Conv2d(self.f2, self.n_classes,
-                #          (n_out_virtual_chans, self.final_conv_length), bias=True),
-                Expression(_transpose_1_0),
-                Expression(_squeeze_final_output),
-            )
 
-        self.apply(glorot_weight_zero_bias)
-
+        out = np_to_var(
+            np.ones((1, self.in_chans, self.input_time_length, self.input_channel),
+                    dtype=np.float32))
+        out = self.forward_init(out)
+        # out = self.separable_conv(self.spatial_conv(self.temporal_conv(out)))
+        n_out_virtual_chans = out.cpu().data.numpy().shape[2]
+        n_out_time = out.cpu().data.numpy().shape[3]
+        self.final_conv_length = n_out_time
+        self.cls = nn.Sequential(
+            nn.Dropout(p=self.drop_prob),
+            Conv2dWithConstraint(self.f2, self.n_classes,
+                                 (n_out_virtual_chans, self.final_conv_length), max_norm=0.5,
+                                 bias=True),
+            # nn.Conv2d(self.f2, self.n_classes,
+            #          (n_out_virtual_chans, self.final_conv_length), bias=True),
+            Expression(_transpose_1_0),
+            Expression(_squeeze_final_output),
+        )
 
     def forward_init(self, x):
         with th.no_grad():
@@ -220,17 +216,11 @@ class EEGNetP(BaseModel):
             edge_weight[self.xs.to(x.device), self.ys.to(x.device)] = self.weight_tril.to(x.device)
             weight = edge_weight + edge_weight.T
             weight = weight + th.diag(self.weight_diag.to(x.device))
-            # weight = normalize_adj(weight)
-            # weight*x*weight
             x = th.matmul(weight.unsqueeze(0), x)
-            # x2 = th.matmul(x1, weight.unsqueeze(0))
-            # x = th.cat([x1, x2], dim=1)
         x = x[:, :, :, None]
         x = self.temporal_conv(x)
         x = self.spatial_conv(x)
         feats = self.separable_conv(x)
-        # if not self.classifier:
-        #     return feats
         return feats, self.cls(feats)
 
     def get_feature_dim(self):
