@@ -13,8 +13,8 @@
     `python data/physionet_process.py`
 * step 3 Train a pre-trained model 
   
-    `python main_pretrain.py -data_path data/preprocess/physionet -id 11`
-* step 3 Train a pre-trained model
+    `python main_pretrain.py -data_path data/preprocess/physionet -id 11 -father_path save/physionet`
+* step 4 Train a AEA-based SFDA model
   
     `python main_AEAGSFDA.py -data_path data/preprocess/physionet -id 11 -resume_path save/physionet/11`
 ## Licence
